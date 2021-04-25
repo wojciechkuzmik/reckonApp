@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserUpdateSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -51,6 +51,8 @@ class LoginView(GenericAPIView):
 			return response
 			#sending a response
 		return Response({'detail':'Invalid credentials'},status=status.HTTP_401_UNAUTHORIZED)
+	def get(self, request):
+		return Response(status=status.HTTP_200_OK)
 	
 class UserView(APIView):
 	def get(self, request):
@@ -77,7 +79,7 @@ class UserView(APIView):
 			raise AuthenticationFailed('Unauthenticated')
 		
 		user=User.objects.filter(username=payload['username']).first()
-		serializer=UserSerializer(user,request.data)
+		serializer=UserUpdateSerializer(user,request.data,partial=True)
 		data={}
 		if serializer.is_valid():
 			serializer.save()

@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-
+os.environ["RECKONAPP_DB_PASS"] = "iVZwRcsjfSicJBlMpGipUyTnsO2uhDGD"
+os.environ["RECKONAPP_SK"] = "7!2zj-m**3yp23r=jxdvw0&4)&qcgv=q3busz4o&mn7zn*socw"
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -136,7 +137,8 @@ USE_TZ = True
 
 
 #JWT_SECRET_KEY
-JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
+JWT_SECRET_KEY='neibiebveiv'
+#JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
 
 
 # Static files (CSS, JavaScript, Images)
