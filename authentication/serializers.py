@@ -76,3 +76,14 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 		instance.last_name = validated_data.get('last_name', instance.last_name)
 		instance.save()
 		return instance
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+	email = serializers.EmailField(max_length=150, min_length=4)
+	username = serializers.CharField(max_length=50, min_length=2)
+	first_name = serializers.CharField(max_length=50, min_length=2)
+	last_name = serializers.CharField(max_length=50, min_length=2)
+
+	class Meta:
+		model = User
+		fields = ['email', 'username', 'first_name', 'last_name']
