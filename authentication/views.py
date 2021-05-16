@@ -10,7 +10,8 @@ from django.contrib.auth.models import User
 from rest_framework.exceptions import AuthenticationFailed
 import jwt
 from django.db.models import Q
-
+from .models import Users
+from .backends import authentication
 
 # Create your views here.
 class RegisterView(GenericAPIView):
@@ -31,23 +32,20 @@ class RegisterView(GenericAPIView):
 
 class LoginView(GenericAPIView):
 	serializer_class = UserSerializer
-
 	def post(self,request):
 		data=request.data
 		email=data.get('email','')
-		username=data.get('username','')
 		password=data.get('password','')
-		user=auth.authenticate(username=username,password=password)
-
+		user=authentication.authenticate(username=email,password=password)
 		if user:
-			auth_token=jwt.encode({'username':user.username},settings.JWT_SECRET_KEY,algorithm='HS256')
+			auth_token=jwt.encode({'email':user.email},settings.JWT_SECRET_KEY,algorithm='HS256')
 
 			serializer=UserSerializer(user)
 
 			data={
 				'user':serializer.data,'token':auth_token
 			}
-			response=Response()
+			response=Response(status=status.HTTP_200_OK)
 			response.set_cookie(key='jwt',value=auth_token,httponly=True)
 			response.data={
 				'jwt':auth_token
@@ -71,7 +69,7 @@ class UserView(APIView):
 		except jwt.ExpiredSignatureError:
 			raise AuthenticationFailed('Unauthenticated')
 		
-		user=User.objects.filter(username=payload['username']).first()
+		user=Users.objects.filter(email=payload['email']).first()
 		serializer=UserSerializer(user)
 		return Response(serializer.data,status=status.HTTP_200_OK)
 
@@ -85,19 +83,33 @@ class UserView(APIView):
 		except jwt.ExpiredSignatureError:
 			raise AuthenticationFailed('Unauthenticated')
 		
-		user=User.objects.filter(username=payload['username']).first()
+		user=Users.objects.filter(email=payload['email']).first()
 		serializer=UserUpdateSerializer(user,request.data,partial=True)
 		data={}
 		if serializer.is_valid():
 			serializer.save()
 			data['success']='successfully updated'
-			return Response(data=data)
+			#update user info in jwt
+			auth_token=jwt.encode({'email':user.email},settings.JWT_SECRET_KEY,algorithm='HS256')
+
+			serializer=UserSerializer(user)
+
+			data={
+				'user':serializer.data,'token':auth_token
+			}
+			response=Response(status=status.HTTP_200_OK)
+			response.set_cookie(key='jwt',value=auth_token,httponly=True)
+			response.data={
+				'jwt':auth_token
+			}
+			#end
+			return response
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
 	def get(self,request):
-		response=Response()
+		response=Response(status=status.HTTP_200_OK)
 		response.delete_cookie('jwt')
 		response.data={
 			'message':'success'
@@ -117,11 +129,11 @@ class SearchView(APIView):
 		except jwt.ExpiredSignatureError:
 			raise AuthenticationFailed('Unauthenticated')
 		
-		logged_user = User.objects.filter(username=payload['username']).first()
-		username = request.data.get('username', None)
+		logged_user = Users.objects.filter(email=payload['email']).first()
+		userid = request.data.get('userid', None)
 		email = request.data.get('email', None)
-		first_name = request.data.get('first_name', None)
-		last_name = request.data.get('last_name', None)
-		users = User.objects.filter(Q(username=username) | Q(email=email) | Q(first_name=first_name) | Q(last_name=last_name)).exclude(username=logged_user.username)
+		firstname = request.data.get('firstname', None)
+		lastname = request.data.get('lastname', None)
+		users = Users.objects.filter(Q(userid=userid) | Q(email=email) | Q(firstname=firstname) | Q(lastname=lastname)).exclude(userid=logged_user.userid)
 		serializer = UserSearchSerializer(users, many=True)
 		return Response(serializer.data,status=status.HTTP_200_OK)

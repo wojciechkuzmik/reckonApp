@@ -31,8 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    #'authentication',
+    'authentication',
     'groups',
+    'reckonings',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,6 +50,8 @@ rest_framework={
     )
     
 }
+
+AUTHENTICATION_BACKENDS = ['authentication.backends.EmailBackend']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

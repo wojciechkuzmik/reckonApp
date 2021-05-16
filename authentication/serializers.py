@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from .models import Users
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -7,27 +7,24 @@ class UserSerializer(serializers.ModelSerializer):
 	email = serializers.EmailField(max_length=150, min_length=4)
 
 	class Meta:
-		model = User
-		fields = ['email', 'username', 'password','first_name','last_name'] 
+		model = Users
+		fields = ['email','userid','password','firstname','lastname'] 
 
 	def validate(self, attrs):
-		if len(attrs['first_name'])==0:
+		if len(attrs['firstname'])==0:
 			raise serializers.ValidationError(
-				{'first_name',('Imię nie może być puste')})
-		if len(attrs['last_name'])==0:
+				{'firstname',('Imię nie może być puste')})
+		if len(attrs['lastname'])==0:
 			raise serializers.ValidationError(
-				{'last_name',('Nazwisko nie może być puste')})
-		if len(attrs['username'])==0:
-			raise serializers.ValidationError(
-				{'username',('Nazwa użytkownika nie może być pusta')})
+				{'lastname',('Nazwisko nie może być puste')})
 		email = attrs.get('email', '')
-		if User.objects.filter(email=email).exists():
+		if Users.objects.filter(email=email).exists():
 			raise serializers.ValidationError(
 				{'email',('Email is already in use')})
 		return super().validate(attrs)
 
 	def create(self, validated_data):
-		return User.objects.create_user(**validated_data)
+		return Users.objects.create(**validated_data)
 
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -35,18 +32,18 @@ class LoginSerializer(serializers.ModelSerializer):
 	email = serializers.EmailField(max_length=150, min_length=4)
 
 	class Meta:
-		model = User
-		fields = ['email', 'username', 'password']
+		model = Users
+		fields = ['email', 'userid', 'password']
 
 	def validate(self, attrs):
 		email = attrs.get('email', '')
-		if User.objects.filter(email=email).exists():
+		if Users.objects.filter(email=email).exists():
 			raise serializers.ValidationError(
 				{'email',('Email is already in use')})
 		return super().validate(attrs)
 
 	def create(self, validated_data):
-		return User.objects.create_user(**validated_data)
+		return Users.objects.create(**validated_data)
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -54,36 +51,36 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 	email = serializers.EmailField(max_length=150, min_length=4)
 
 	class Meta:
-		model = User
-		fields = ['email', 'username', 'password','first_name','last_name'] 
+		model = Users
+		fields = ['email', 'userid', 'password','firstname','lastname'] 
 
 	def validate(self, attrs):
-		if len(attrs['first_name'])==0:
+		if len(attrs['firstname'])==0:
 			raise serializers.ValidationError(
-				{'first_name',('Musisz podać imię')})
-		if len(attrs['last_name'])==0:
+				{'firstname',('Musisz podać imię')})
+		if len(attrs['lastname'])==0:
 			raise serializers.ValidationError(
-				{'last_name',('Musisz podać nazwisko')})
-		if len(attrs['username'])==0:
+				{'lastname',('Musisz podać nazwisko')})
+		if len(attrs['email'])==0:
 			raise serializers.ValidationError(
-				{'username',('Musisz podać nazwę użytkownika')})
+				{'email',('Musisz podać email')})
 		return super().validate(attrs)
 	
 	def update(self, instance, validated_data):
 		instance.email = validated_data.get('email', instance.email)
-		instance.username = validated_data.get('username', instance.username)
-		instance.first_name = validated_data.get('first_name', instance.first_name)
-		instance.last_name = validated_data.get('last_name', instance.last_name)
+		instance.userid = validated_data.get('userid', instance.userid)
+		instance.firstname = validated_data.get('firstname', instance.firstname)
+		instance.lastname = validated_data.get('lastname', instance.lastname)
 		instance.save()
 		return instance
 
 
 class UserSearchSerializer(serializers.ModelSerializer):
 	email = serializers.EmailField(max_length=150, min_length=4)
-	username = serializers.CharField(max_length=50, min_length=2)
-	first_name = serializers.CharField(max_length=50, min_length=2)
-	last_name = serializers.CharField(max_length=50, min_length=2)
+	userid = serializers.CharField(max_length=50, min_length=2)
+	firstname = serializers.CharField(max_length=50, min_length=2)
+	lastname = serializers.CharField(max_length=50, min_length=2)
 
 	class Meta:
-		model = User
-		fields = ['email', 'username', 'first_name', 'last_name']
+		model = Users
+		fields = ['email', 'userid', 'firstname', 'lastname']

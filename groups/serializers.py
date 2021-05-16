@@ -17,6 +17,12 @@ class UserSerializerShort(serializers.ModelSerializer):
         model = Users
         fields = ['email']
 
+class GroupMemberSerializerShort(serializers.ModelSerializer):
+
+    class Meta:
+        model = Groupmembers
+        fields = ['groupmemberid']
+
 
 class GroupMemberSerializer(serializers.ModelSerializer):
     members = UserSerializerShort(many=True, required=False, allow_null=True)

@@ -36,7 +36,7 @@ class CreateGroupView(GenericAPIView):
 
 class GroupInfoView(GenericAPIView):
     serializer_class = GroupSerializer
-
+    queryset = Groups.objects.all()#Piotrek: dodałem to bo nie działało bez
     def get(self, request, user_id):
 
         groups = Groups.objects.filter(groupid__in=Groupmembers.objects.filter(userid=user_id).values_list('groupid'))
