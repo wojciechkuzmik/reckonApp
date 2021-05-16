@@ -1,7 +1,9 @@
 import jwt 
 from rest_framework import authentication,exceptions
 from django.conf import settings
-from django.contrib.auth.models import User
+from .models import Users
+from django.contrib.auth.backends import ModelBackend
+
 
 class JWTAuthentication(authentication.BaseAuthentication):
     def authenticate(self,request):
@@ -15,7 +17,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         try:
             payload=jwt.decode(token,settings.JWT_SECRET_KEY)#this should be env variable
 
-            user=User.objects.get(username=payload['username'])
+            user=Users.objects.get(username=payload['username'])
 
             return (user,token)
 
@@ -26,3 +28,16 @@ class JWTAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed('Your token is expired, login')
 
         return super().authenticate(request)
+
+
+class EmailBackend(ModelBackend):
+    def authenticate(self, request, username=None, password=None):
+        UserModel = Users
+        try:
+            user = UserModel.objects.get(email=username)
+        except UserModel.DoesNotExist:
+            return None
+        else:
+            if user.password==password:
+                return user
+        return None
