@@ -24,8 +24,29 @@ SECRET_KEY = os.environ.get('RECKONAPP_SK')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+  'http://localhost:3000',
+]
+ALLOWED_HOSTS=['*']
+SESSION_COOKIE_HTTPONLY = False
+ALLOWED_HOSTS = ['127.0.0.1']
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'cookies',
+    'Access-Control-Allow-Origin',
+    'jwt',
 
-ALLOWED_HOSTS = []
+]
 
 
 # Application definition
@@ -41,7 +62,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders',
 ]
 
 rest_framework={
@@ -61,6 +83,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'reckonApp.urls'

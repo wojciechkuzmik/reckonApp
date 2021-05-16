@@ -36,7 +36,8 @@ class LoginView(GenericAPIView):
 		data=request.data
 		email=data.get('email','')
 		password=data.get('password','')
-		user=authentication.authenticate(username=email,password=password)
+		user=auth.authenticate(username=username,password=password)
+		print(request.data)
 		if user:
 			auth_token=jwt.encode({'email':user.email},settings.JWT_SECRET_KEY,algorithm='HS256')
 
@@ -45,14 +46,14 @@ class LoginView(GenericAPIView):
 			data={
 				'user':serializer.data,'token':auth_token
 			}
-			response=Response(status=status.HTTP_200_OK)
-			response.set_cookie(key='jwt',value=auth_token,httponly=True)
+			response=Response()
+			response.set_cookie(key='jwt',value=auth_token)
 			response.data={
 				'jwt':auth_token
 			}
 			return response
 			#sending a response
-		return Response({'detail':'Invalid credentials'},status=status.HTTP_401_UNAUTHORIZED)
+		return Response({'detail':'[Invalid credentials]'},status=status.HTTP_401_UNAUTHORIZED)
 
 	def get(self, request):
 		return Response(status=status.HTTP_200_OK)
@@ -60,7 +61,12 @@ class LoginView(GenericAPIView):
 
 class UserView(APIView):
 	def get(self, request):
-		token=request.COOKIES.get('jwt')
+		print(request.data)
+		token=request.headers.get('jwt')
+		print(token)
+		print(request)
+		print(request.headers)
+		print(request.COOKIES)
 		if not token:
 			raise AuthenticationFailed('Unauthenticated')
 		
@@ -73,7 +79,7 @@ class UserView(APIView):
 		serializer=UserSerializer(user)
 		return Response(serializer.data,status=status.HTTP_200_OK)
 
-	def put(self,request): #put dziala ale przyjmuje obiekt typu json, nie wiem jak zrobic jakis form do tego
+	def put(self,request):
 		token=request.COOKIES.get('jwt')
 		if not token:
 			raise AuthenticationFailed('Unauthenticated')
