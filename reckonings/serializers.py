@@ -22,7 +22,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ReckoningSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reckonings
-        fields = ['reckoningid', 'name', 'startdate', 'deadline','groupid']
+        fields = ['reckoningid', 'name', 'startdate', 'deadline','groupid', 'author']
     
     def validate(self, attrs):
         if len(attrs['name']) == 0:
@@ -36,15 +36,17 @@ class ReckoningSerializer(serializers.ModelSerializer):
         "name":validated_data.pop('name'),
         "startdate":datetime.now(),
         "deadline":validated_data.pop('deadline'),
-        "groupid":validated_data.pop('groupid')
+        "groupid":validated_data.pop('groupid'),
+        "author":validated_data.pop('author')
          }
         instance = Reckonings.objects.create(**full_data)
         return instance
 
+
 class ReckoningPositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reckoningpositions
-        fields = ['reckoningpositionid', 'name', 'amount', 'categoryid','groupmemberid','reckoningid']
+        fields = ['reckoningpositionid', 'name', 'amount', 'categoryid','groupmemberid','reckoningid','paymentdate']
     def validate(self, attrs):
         if len(attrs['name']) == 0:
             raise serializers.ValidationError(
@@ -59,17 +61,19 @@ class ReckoningPositionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         rec_id=validated_data.pop('reckoningid').reckoningid
         group_id=Reckonings.objects.filter(reckoningid=rec_id).values_list('groupid')
-        group_members=Groupmembers.objects.all().filter(groupid=group_id[0][0]).values_list('groupmemberid')
+        group_members=Groupmembers.objects.all().filter(groupid=group_id[0][0]).values_list('groupmemberid')#stąd trzeba wykluczyć wybranych ludzi z grupy i elo, tylko nie wiem jak
         name=validated_data.pop('name')
         amount=validated_data.pop('amount')
         cat_id=validated_data.pop('categoryid')
+        paymentdate=validated_data.pop('paymentdate')
         for i in group_members:
             full_data={
                 "name":name,
                 "amount":amount,
                 "reckoningid":Reckonings.objects.get(reckoningid=rec_id),
                 "categoryid":cat_id,
-                "groupmemberid":Groupmembers.objects.get(groupmemberid=i[0])
+                "groupmemberid":Groupmembers.objects.get(groupmemberid=i[0]),
+                "paymentdate":paymentdate
                 }
             instance = Reckoningpositions.objects.create(**full_data)
         return instance
