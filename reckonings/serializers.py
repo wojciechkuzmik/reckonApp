@@ -77,3 +77,37 @@ class ReckoningPositionSerializer(serializers.ModelSerializer):
                 }
             instance = Reckoningpositions.objects.create(**full_data)
         return instance
+
+class ReckoningPositionForOneUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reckoningpositions
+        fields = ['reckoningpositionid', 'name', 'amount', 'categoryid','groupmemberid','reckoningid','paymentdate']
+    def validate(self, attrs):
+        if len(attrs['name']) == 0:
+            raise serializers.ValidationError(
+                {'name', ('Musisz podać nazwę')}
+            )
+        if attrs['amount']<0 or not isinstance(attrs['amount'], float):
+            raise serializers.ValidationError(
+                {'amount', ('Musisz podać prawidłową kwotę')}
+            )
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        rec_id=validated_data.pop('reckoningid').reckoningid
+        group_id=Reckonings.objects.filter(reckoningid=rec_id).values_list('groupid')
+        name=validated_data.pop('name')
+        amount=validated_data.pop('amount')
+        cat_id=validated_data.pop('categoryid')
+        paymentdate=validated_data.pop('paymentdate')
+        member_to_add=validated_data.pop('groupmemberid')
+        full_data={
+            "name":name,
+            "amount":amount,
+            "reckoningid":Reckonings.objects.get(reckoningid=rec_id),
+            "categoryid":cat_id,
+            "groupmemberid":member_to_add,
+            "paymentdate":paymentdate
+            }
+        instance = Reckoningpositions.objects.create(**full_data)
+        return instance

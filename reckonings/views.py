@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import ReckoningSerializer, ReckoningPositionSerializer, CategorySerializer,GroupMemberSerializer
+from .serializers import ReckoningSerializer, ReckoningPositionSerializer, CategorySerializer,GroupMemberSerializer, ReckoningPositionForOneUserSerializer
 from groups.serializers import GroupSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -109,6 +109,19 @@ class CreateReckoningPositionView(GenericAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class CreateReckoningPositionForOneView(GenericAPIView):
+    serializer_class = ReckoningPositionForOneUserSerializer
+
+    def post(self, request):
+        serializer = ReckoningPositionForOneUserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class ReckoningPositionsView(GenericAPIView):
     queryset=Reckoningpositions
     def get(self, request, reckoning_id):
@@ -141,7 +154,6 @@ class ReckoningPositionsByUserView(GenericAPIView):
         ids=[]
         for i in reckoning.values('reckoningid'):
             ids.append(i["reckoningid"])
-        print(ids)
         reckoningPositionsByUser=Reckoningpositions.objects.filter(reckoningid__in=ids)
         return Response(ReckoningPositionSerializer(reckoningPositionsByUser,many=True).data, status=status.HTTP_200_OK)
 
