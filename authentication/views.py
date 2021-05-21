@@ -36,8 +36,7 @@ class LoginView(GenericAPIView):
 		data=request.data
 		email=data.get('email','')
 		password=data.get('password','')
-		user=auth.authenticate(username=username,password=password)
-		print(request.data)
+		user=auth.authenticate(username=email,password=password)
 		if user:
 			auth_token=jwt.encode({'email':user.email},settings.JWT_SECRET_KEY,algorithm='HS256')
 
@@ -136,10 +135,10 @@ class SearchView(APIView):
 			raise AuthenticationFailed('Unauthenticated')
 		
 		logged_user = Users.objects.filter(email=payload['email']).first()
-		userid = request.data.get('userid', None)
-		email = request.data.get('email', None)
-		firstname = request.data.get('firstname', None)
-		lastname = request.data.get('lastname', None)
+		userid = request.GET.get('userid')
+		email = request.GET.get('email')
+		firstname = request.GET.get('firstname')
+		lastname = request.GET.get('lastname')
 		users = Users.objects.filter(Q(userid=userid) | Q(email=email) | Q(firstname=firstname) | Q(lastname=lastname)).exclude(userid=logged_user.userid)
 		serializer = UserSearchSerializer(users, many=True)
 		return Response(serializer.data,status=status.HTTP_200_OK)
