@@ -71,7 +71,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 		instance.userid = validated_data.get('userid', instance.userid)
 		instance.firstname = validated_data.get('firstname', instance.firstname)
 		instance.lastname = validated_data.get('lastname', instance.lastname)
-		print(validated_data.get('password', instance.lastname))
+		instance.password = validated_data.get('password', instance.password)
 		instance.save()
 		return instance
 
