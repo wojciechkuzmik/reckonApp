@@ -27,6 +27,7 @@ class GroupMemberSerializerShort(serializers.ModelSerializer):
 class GroupMemberSerializer(serializers.ModelSerializer):
     members = UserSerializerShort(many=True, required=False, allow_null=True)
     groupid = serializers.IntegerField(required=False)
+    startdate = serializers.DateTimeField(required=False)
 
     class Meta:
         model = Groups
@@ -49,7 +50,12 @@ class GroupMemberSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         members = validated_data.pop('members', None)
-        instance = Groups.objects.create(**validated_data)
+        name=validated_data.pop('name',None)
+        full_data={
+                    "name":name,
+                    "startdate":datetime.now()
+                }
+        instance = Groups.objects.create(**full_data)
 
         if members is not None:
             for member in members:
