@@ -79,7 +79,7 @@ class UserView(APIView):
 		return Response(serializer.data,status=status.HTTP_200_OK)
 
 	def put(self,request):
-		token=request.COOKIES.get('jwt')
+		token=request.headers.get('jwt')
 		if not token:
 			raise AuthenticationFailed('Unauthenticated')
 		
@@ -125,7 +125,7 @@ class LogoutView(APIView):
 class SearchView(APIView):
 
 	def get(self, request):
-		token=request.COOKIES.get('jwt')
+		token=request.headers.get('jwt')
 		if not token:
 			raise AuthenticationFailed('Unauthenticated')
 		
