@@ -8,15 +8,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-class Categories(models.Model):
-    categoryid = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-
-    class Meta:
-        managed = False
-        db_table = 'categories'
-
-
 class Exceptions(models.Model):
     exceptionid = models.AutoField(primary_key=True)
     description = models.CharField(max_length=255)
@@ -53,7 +44,6 @@ class Reckoningpositions(models.Model):
     reckoningpositionid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     amount = models.FloatField()
-    categoryid = models.ForeignKey(Categories, models.DO_NOTHING, db_column='categoryid')
     groupmemberid = models.ForeignKey(Groupmembers, models.DO_NOTHING, db_column='groupmemberid',blank=True, null=True)
     reckoningid = models.ForeignKey('Reckonings', models.DO_NOTHING, db_column='reckoningid')
     paymentdate = models.DateTimeField(blank=True, null=True)

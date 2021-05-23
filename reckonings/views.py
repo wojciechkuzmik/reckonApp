@@ -1,47 +1,19 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import ReckoningSerializer, ReckoningPositionSerializer, CategorySerializer,GroupMemberSerializer, ReckoningPositionForOneUserSerializer
+from .serializers import ReckoningSerializer, ReckoningPositionSerializer,GroupMemberSerializer, ReckoningPositionForOneUserSerializer
 from groups.serializers import GroupSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Reckonings, Users, Groups, Categories,Reckoningpositions,Groupmembers
+from .models import Reckonings, Users, Groups, Reckoningpositions,Groupmembers
 # Create your views here.
 
-class CreateCategoryView(GenericAPIView):
-    serializer_class = CategorySerializer
+class GroupMemberUserView(GenericAPIView):
 
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
+    def get(self, request, groupmemberid):
 
-        if serializer.is_valid():
-            serializer.save()
+        reckoning = Groupmembers.objects.get(groupmemberid=groupmemberid)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-class CategoriesView(GenericAPIView):
-    serializer_class = CategorySerializer
-    
-    def get(self, request):
-        serializer = CategorySerializer(data=request.data)
-        response=Response()
-        response.data={
-            'categories':CategorySerializer(Categories.objects.all(),many=True).data
-        }
-        return Response(response.data, status=status.HTTP_200_OK)
-
-class CategoryView(GenericAPIView):
-    serializer_class = CategorySerializer
-    
-    def get(self, request, cat_id):
-        serializer = CategorySerializer(data=request.data)
-        response=Response()
-        response.data={
-            'categories':CategorySerializer(Categories.objects.get(categoryid=cat_id)).data
-        }
-        return Response(response.data, status=status.HTTP_200_OK)
-
+        return Response(GroupMemberSerializer(reckoning).data, status=status.HTTP_200_OK)
 
 class CreateReckoningView(GenericAPIView):
     serializer_class = ReckoningSerializer
