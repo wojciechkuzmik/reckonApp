@@ -1,12 +1,12 @@
 from django.db import models
+from datetime import datetime
 
 
 class Groupmembers(models.Model):
     groupmemberid = models.AutoField(primary_key=True)
     groupid = models.ForeignKey('Groups', models.DO_NOTHING, db_column='groupid')
     userid = models.ForeignKey('Users', models.DO_NOTHING, db_column='userid')
-    roleid = models.ForeignKey('Roles', models.DO_NOTHING, db_column='roleid')
-    adddate = models.DateTimeField()
+    adddate = models.DateTimeField(default=datetime.now())
 
     class Meta:
         managed = False
@@ -29,7 +29,7 @@ class Users(models.Model):
 class Groups(models.Model):
     groupid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    startdate = models.DateTimeField()
+    startdate = models.DateTimeField(default=datetime.now())
     members = models.ManyToManyField(Users, through='Groupmembers', through_fields=('groupid', 'userid'))
 
     class Meta:
@@ -40,7 +40,7 @@ class Groups(models.Model):
 class Group(models.Model):
     groupid = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    startdate = models.DateTimeField()
+    startdate = models.DateTimeField(default=datetime.now())
 
     class Meta:
         managed = False

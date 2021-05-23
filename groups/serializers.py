@@ -1,6 +1,6 @@
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from .models import Groups, Users, Groupmembers, Roles
+from .models import Group, Groups, Users, Groupmembers
 from datetime import datetime
 
 
@@ -17,6 +17,7 @@ class UserSerializerShort(serializers.ModelSerializer):
         model = Users
         fields = ['email']
 
+
 class GroupMemberSerializerShort(serializers.ModelSerializer):
 
     class Meta:
@@ -24,14 +25,14 @@ class GroupMemberSerializerShort(serializers.ModelSerializer):
         fields = ['groupmemberid']
 
 
-class GroupMemberSerializer(serializers.ModelSerializer):
-    members = UserSerializerShort(many=True, required=False, allow_null=True)
-    groupid = serializers.IntegerField(required=False)
+class GroupsWithMembersSerializer(serializers.ModelSerializer):
+    members = UserSerializer(many=True)
 
     class Meta:
         model = Groups
         fields = ['groupid', 'name', 'startdate', 'members']
 
+    """
     def validate(self, attrs):
         if len(attrs['name']) == 0:
             raise serializers.ValidationError(
@@ -56,7 +57,6 @@ class GroupMemberSerializer(serializers.ModelSerializer):
                 user = Users.objects.get(email=member['email'])
                 Groupmembers.objects.create(
                     groupid=instance,
-                    roleid=Roles.objects.get(roleid=1),
                     userid=user,
                     adddate=datetime.now())
         return instance
@@ -65,28 +65,74 @@ class GroupMemberSerializer(serializers.ModelSerializer):
         instance.name = validated_data['name']
         instance.startdate = validated_data['startdate']
         instance.save()
-        Groupmembers.objects.filter(groupid=instance.groupid).delete()
 
-        members = validated_data.pop('members', None)
-        if members is not None:
-            for member in members:
-                user = Users.objects.get(email=member['email'])
-                Groupmembers.objects.create(
-                    groupid=instance,
-                    roleid=Roles.objects.get(roleid=1),
-                    userid=user,
-                    adddate=datetime.now())
+        return instance
 
+"""
+
+
+class GroupMemberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Groupmembers
+        fields = ['groupmemberid', 'groupid', 'userid', 'adddate']
+
+    def validate(self, attrs):
+        if 'groupmemberid' in attrs:
+            if len(attrs['groupmemberid']) == 0:
+                raise serializers.ValidationError(
+                    {'groupmemberid', ('Group memberid id must not be blank')}
+                )
+            try:
+                groupmember = Groupmembers.objects.get(groupmemberid=attrs['groupmemberid'])
+            except ObjectDoesNotExist:
+                raise serializers.ValidationError({'groupmemberid', 'Incorrect group member id: ' + attrs['groupmemberid']})
+
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        group = validated_data.pop('groupid', None)
+        user = validated_data.pop('userid', None)
+        if group is None:
+            raise serializers.ValidationError(
+                {'groupid': 'If you want to create group member, provide group id'}
+            )
+        if user is None:
+            raise serializers.ValidationError(
+                {'userid': 'If you want to create group member, provide user id'}
+            )
+
+        instance = Groupmembers.objects.create(
+            groupid=group,
+            userid=user,
+            adddate=datetime.now()
+        )
         return instance
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    members = UserSerializer(many=True, required=False, allow_null=True)
 
     class Meta:
-        model = Groups
-        fields = ['groupid', 'name', 'startdate', 'members']
+        model = Group
+        fields = ['groupid', 'name', 'startdate']
 
+    def validate(self, attrs):
+        if len(attrs['name']) == 0:
+            raise serializers.ValidationError(
+                {'name', ('Musisz podać nazwę')}
+            )
+        return super().validate(attrs)
 
+    def create(self, validated_data):
+        instance = Group.objects.create(
+            name=validated_data.pop('name'),
+            startdate=datetime.now()
+        )
+        return instance
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.pop('name')
+        instance.save()
+        return instance
 
 

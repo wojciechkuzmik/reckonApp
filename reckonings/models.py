@@ -28,7 +28,6 @@ class Groupmembers(models.Model):
     groupmemberid = models.AutoField(primary_key=True)
     groupid = models.ForeignKey('Groups', models.DO_NOTHING, db_column='groupid')
     userid = models.ForeignKey('Users', models.DO_NOTHING, db_column='userid')
-    roleid = models.ForeignKey('Roles', models.DO_NOTHING, db_column='roleid')
     adddate = models.DateTimeField()
 
     class Meta:
@@ -78,15 +77,6 @@ class Reckonings(models.Model):
 
     def __str__(self):
         return str(self.reckoningid)
-
-
-class Roles(models.Model):
-    roleid = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-
-    class Meta:
-        managed = False
-        db_table = 'roles'
 
 
 class Users(models.Model):

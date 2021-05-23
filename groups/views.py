@@ -1,17 +1,38 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
-from .serializers import GroupSerializer, GroupMemberSerializer
+
+from .serializers import GroupSerializer, GroupMemberSerializer, GroupsWithMembersSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Groups, Groupmembers
+from .models import Group, Groups, Groupmembers
 # Create your views here.
 
 
-class CreateGroupView(GenericAPIView):
-    serializer_class = GroupMemberSerializer
+# create and update group
+class GroupView(GenericAPIView):
+    serializer_class = GroupSerializer
+
+    def get(self, request, pk):
+
+        group = Groups.objects.get(groupid=pk)
+
+        return Response(GroupsWithMembersSerializer(group).data, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk):
+        serializer = GroupSerializer(data=request.data)
+
+        if serializer.is_valid():
+            try:
+                instance = Group.objects.get(groupid=pk)
+            except Exception as e:
+                return Response(str(e), status=status.HTTP_404_NOT_FOUND)
+            serializer.update(instance, serializer.data)
+            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
-        serializer = GroupMemberSerializer(data=request.data)
+        serializer = GroupSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -20,36 +41,48 @@ class CreateGroupView(GenericAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request):
+
+class GroupMembersView(GenericAPIView):
+    serializer_class = GroupMemberSerializer
+    queryset = Groupmembers.objects.all()
+
+    def get(self, request, pk):
+        group = Groups.objects.get(groupid=pk)
+        return Response(GroupMemberSerializer(Groupmembers.objects.filter(groupid=group), many=True).data, status=status.HTTP_200_OK)
+
+    def post(self, request):
         serializer = GroupMemberSerializer(data=request.data)
 
         if serializer.is_valid():
             try:
-                instance = Groups.objects.get(groupid=serializer.data['groupid'])
+                serializer.save()
             except:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            serializer.update(instance, serializer.data)
-            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, pk):
 
+        try:
+            instance = Groupmembers.objects.get(groupmemberid=pk)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# get info about group with given groupid
 class GroupInfoView(GenericAPIView):
-    serializer_class = GroupSerializer
+    serializer_class = GroupsWithMembersSerializer
     queryset = Groups.objects.all()#Piotrek: dodałem to bo nie działało bez
     def get(self, request, user_id):
 
         groups = Groups.objects.filter(groupid__in=Groupmembers.objects.filter(userid=user_id).values_list('groupid'))
 
-        return Response(GroupSerializer(groups, many=True).data, status=status.HTTP_200_OK)
+        return Response(GroupsWithMembersSerializer(groups, many=True).data, status=status.HTTP_200_OK)
 
 
-class GroupView(GenericAPIView):
-
-    def get(self, request, group_id):
-
-        group = Groups.objects.get(groupid=group_id)
-
-        return Response(GroupSerializer(group).data, status=status.HTTP_200_OK)
 
 

@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from rest_framework import serializers
-from .models import Groups, Users, Groupmembers, Roles, Reckonings, Categories,Reckoningpositions
+from .models import Groups, Users, Groupmembers, Reckonings, Categories,Reckoningpositions
 from groups.serializers import GroupMemberSerializer
 from datetime import datetime
 
