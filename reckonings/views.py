@@ -19,6 +19,11 @@ class CreateReckoningView(GenericAPIView):
     serializer_class = ReckoningSerializer
 
     def post(self, request):
+        print(request.data)
+        grp_id=request.data['groupid']
+        id_user_received=request.data['author']
+        group_member=GroupMemberSerializer( Groupmembers.objects.filter(groupid=grp_id).filter(userid=id_user_received),many=True).data[0]['groupmemberid']
+        request.data['author']=group_member
         serializer = ReckoningSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -97,6 +102,13 @@ class CreateReckoningPositionForOneView(GenericAPIView):
     serializer_class = ReckoningPositionForOneUserSerializer
 
     def post(self, request):
+        rec_id=request.data['reckoningid']
+        group_id=Reckonings.objects.filter(reckoningid=rec_id).values_list('groupid')[0]
+        id_user_received=request.data['groupmemberid']
+        print(group_id,id_user_received)
+        group_member=Groupmembers.objects.filter(groupid=group_id).filter(userid=id_user_received)[0]
+        request.data['groupmemberid']=GroupMemberSerializer(group_member).data['groupmemberid']
+
         serializer = ReckoningPositionForOneUserSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -163,18 +175,3 @@ class ReckoningPositionsByUserView(GenericAPIView):
             userinfo=UserSerializer(Users.objects.get(userid=userid)).data
             item['author_detail']=userinfo
         return Response(response_data, status=status.HTTP_200_OK)
-
-
-"""
-
-Nie wiem czy to się przyda jakoś, możnaby zrobić np coś w stylu wyświetlania jednej osoby przypisanej do konretnego rachunku(reckoningposition)
-class ReckoningPositionMembersView(GenericAPIView):
-    queryset=Reckoningpositions
-    def get(self, request, reckoningPosition_id):
-
-        reckoning = Reckoningpositions.objects.filter(reckoningid=reckoningPosition_id)
-        
-
-        return Response(ReckoningPositionSerializer(reckoning).data, status=status.HTTP_200_OK)
-
-"""

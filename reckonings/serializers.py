@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from rest_framework import serializers
 from .models import Groups, Users, Groupmembers, Reckonings,Reckoningpositions
-from groups.serializers import GroupMemberSerializer, GroupSerializer
+from groups.serializers import GroupMemberSerializer, GroupSerializer,UserSerializer
 from datetime import datetime
 
 
@@ -19,10 +19,10 @@ class ReckoningSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         autor_groupmember=validated_data.pop('author')
-        id_user_received=GroupMemberSerializer(autor_groupmember).data['groupmemberid']
         grp_id=validated_data.pop('groupid')
         gr_id=GroupSerializer(grp_id).data['groupid']
-        group_member=Groupmembers.objects.filter(groupid=gr_id).filter(userid=id_user_received)[0]
+        id_user_received=GroupMemberSerializer(autor_groupmember).data['groupmemberid']
+        group_member=Groupmembers.objects.get(groupmemberid=id_user_received)
         full_data={
         "name":validated_data.pop('name'),
         "startdate":datetime.now(),
@@ -81,7 +81,7 @@ class ReckoningPositionForOneUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'amount', ('Musisz podać prawidłową kwotę')}
             )
-        return super().validate(attrs)
+        return attrs
 
     def create(self, validated_data):
         rec_id=validated_data.pop('reckoningid').reckoningid
@@ -91,7 +91,7 @@ class ReckoningPositionForOneUserSerializer(serializers.ModelSerializer):
         paymentdate=validated_data.pop('paymentdate')
         member_to_add=validated_data.pop('groupmemberid')
         id_user_received=GroupMemberSerializer(member_to_add).data['groupmemberid']
-        group_member=Groupmembers.objects.filter(groupid=group_id).filter(userid=id_user_received)[0]
+        group_member=Groupmembers.objects.get(groupmemberid=id_user_received)
         full_data={
             "name":name,
             "amount":amount,
