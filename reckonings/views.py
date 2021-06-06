@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView
 from .serializers import ReckoningSerializer, ReckoningPositionSerializer,GroupMemberSerializer, ReckoningPositionForOneUserSerializer
-from groups.serializers import GroupSerializer
+from groups.serializers import GroupSerializer,UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Reckonings, Users, Groups, Reckoningpositions,Groupmembers
@@ -33,10 +33,16 @@ class CreateReckoningView(GenericAPIView):
 class ReckoningView(GenericAPIView):
 
     def get(self, request, reckoning_id):
-
         reckoning = Reckonings.objects.get(reckoningid=reckoning_id)
-
-        return Response(ReckoningSerializer(reckoning).data, status=status.HTTP_200_OK)
+        groupmemberid=ReckoningSerializer(reckoning).data['author']
+        grpmember=GroupMemberSerializer(Groupmembers.objects.filter(groupmemberid=groupmemberid),many=True)
+        reckoninginfo=ReckoningSerializer(reckoning).data
+        reckoninginfo["autor"]=grpmember.data
+        reck_inf_autor=reckoninginfo["autor"]
+        userid=reck_inf_autor[0]['userid']
+        userinfo=UserSerializer(Users.objects.get(userid=userid)).data
+        reckoninginfo["autor_details"]=userinfo
+        return Response(reckoninginfo, status=status.HTTP_200_OK)
 
 class ReckoningsInGroupView(GenericAPIView):
     queryset=Reckonings
@@ -46,7 +52,7 @@ class ReckoningsInGroupView(GenericAPIView):
 
         reckoning_ids={}
         for i in reckoning:
-            reckoning_ids[ReckoningSerializer(i).data['reckoningid']]="NO"
+            reckoning_ids[ReckoningSerializer(i).data['reckoningid']]="DoesNotMatter"
         for i in reckoning_ids.keys():
             payed="False"
             all_payed="True"
@@ -65,6 +71,12 @@ class ReckoningsInGroupView(GenericAPIView):
         reckonings=ReckoningSerializer(reckoning,many=True).data
         for item in reckonings:
             item['payment_status']=reckoning_ids[item['reckoningid']]
+            author_id=item['author']
+            grpmember=GroupMemberSerializer(Groupmembers.objects.filter(groupmemberid=author_id),many=True)
+            reck_inf_autor=grpmember.data
+            userid=reck_inf_autor[0]['userid']
+            userinfo=UserSerializer(Users.objects.get(userid=userid)).data
+            item['author_detail']=userinfo
 
         return Response(reckonings, status=status.HTTP_200_OK)
 
@@ -97,9 +109,16 @@ class CreateReckoningPositionForOneView(GenericAPIView):
 class ReckoningPositionsView(GenericAPIView):
     queryset=Reckoningpositions
     def get(self, request, reckoning_id):
-
         reckoning = Reckoningpositions.objects.filter(reckoningid=reckoning_id)
-        return Response(ReckoningPositionSerializer(reckoning,many=True).data, status=status.HTTP_200_OK)
+        response_data=ReckoningPositionSerializer(reckoning,many=True).data
+        for item in response_data:
+            author_id=item['groupmemberid']
+            grpmember=GroupMemberSerializer(Groupmembers.objects.filter(groupmemberid=author_id),many=True)
+            reck_inf_autor=grpmember.data
+            userid=reck_inf_autor[0]['userid']
+            userinfo=UserSerializer(Users.objects.get(userid=userid)).data
+            item['author_detail']=userinfo
+        return Response(response_data, status=status.HTTP_200_OK)
 
 class ReckoningPositionsForUserView(GenericAPIView):
     queryset=Groupmembers
@@ -111,7 +130,15 @@ class ReckoningPositionsForUserView(GenericAPIView):
             ids.append(i["groupmemberid"])
         #print(group_member_ids_for_user)
         reckoning = Reckoningpositions.objects.filter(groupmemberid__in=ids)
-        return Response(ReckoningPositionSerializer(reckoning,many=True).data, status=status.HTTP_200_OK)
+        response_data=ReckoningPositionSerializer(reckoning,many=True).data
+        for item in response_data:
+            author_id=item['groupmemberid']
+            grpmember=GroupMemberSerializer(Groupmembers.objects.filter(groupmemberid=author_id),many=True)
+            reck_inf_autor=grpmember.data
+            userid=reck_inf_autor[0]['userid']
+            userinfo=UserSerializer(Users.objects.get(userid=userid)).data
+            item['author_detail']=userinfo
+        return Response(response_data, status=status.HTTP_200_OK)
 
 class ReckoningPositionsByUserView(GenericAPIView):
     queryset=Reckoningpositions
@@ -127,7 +154,15 @@ class ReckoningPositionsByUserView(GenericAPIView):
         for i in reckoning.values('reckoningid'):
             ids.append(i["reckoningid"])
         reckoningPositionsByUser=Reckoningpositions.objects.filter(reckoningid__in=ids)
-        return Response(ReckoningPositionSerializer(reckoningPositionsByUser,many=True).data, status=status.HTTP_200_OK)
+        response_data=ReckoningPositionSerializer(reckoningPositionsByUser,many=True).data
+        for item in response_data:
+            author_id=item['groupmemberid']
+            grpmember=GroupMemberSerializer(Groupmembers.objects.filter(groupmemberid=author_id),many=True)
+            reck_inf_autor=grpmember.data
+            userid=reck_inf_autor[0]['userid']
+            userinfo=UserSerializer(Users.objects.get(userid=userid)).data
+            item['author_detail']=userinfo
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 """
