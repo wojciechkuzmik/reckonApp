@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateReckoningView,ReckoningView,CreateReckoningPositionView, ReckoningPositionsView,ReckoningsInGroupView, ReckoningPositionsForUserView,ReckoningPositionsByUserView, CreateReckoningPositionForOneView,GroupMemberUserView
+from .views import CreateReckoningView,ReckoningView,CreateReckoningPositionView, ReckoningPositionsView,ReckoningsInGroupView, ReckoningPositionsForUserView,ReckoningPositionsByUserView, CreateReckoningPositionForOneView,GroupMemberUserView,UpdateReckoningStatusView
 #ReckoningPositionMembersView
 
 urlpatterns = [
@@ -11,8 +11,8 @@ urlpatterns = [
 	path('reckoningPosition', CreateReckoningPositionForOneView.as_view()),#create reckoningPosition FOR ONE SPECIFIED USER
 	path('reckoningPosition/<int:reckoning_id>', ReckoningPositionsView.as_view()),	#get info about reckoning positions in reckoning
 	path('reckoningPositionsForUser/<int:user_id>',ReckoningPositionsForUserView.as_view()),#get info about reckoning positions that user has to pay
-	path('reckoningPositionsByUser/<int:user_id>',ReckoningPositionsByUserView.as_view())#get info about reckoning positions that user has to pay
+	path('reckoningPositionsByUser/<int:user_id>',ReckoningPositionsByUserView.as_view()),#get info about reckoning positions that user has to pay
+	path('UpdateReckoningStatusView',UpdateReckoningStatusView.as_view())
+	#update users reckoning position status
 
-
-	#path('reckoningPositionMembers/<int:reckoningPosition_id>', ReckoningPositionMembersView.as_view()),	#get info about people present in reckoning position
 ]
