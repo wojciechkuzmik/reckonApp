@@ -75,7 +75,7 @@ class GroupMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Groupmembers
-        fields = ['groupmemberid', 'groupid', 'userid', 'adddate']
+        fields = ['groupmemberid', 'groupid', 'userid', 'adddate', 'isactive']
 
     def validate(self, attrs):
         if 'groupmemberid' in attrs:
