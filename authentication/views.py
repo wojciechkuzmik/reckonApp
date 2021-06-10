@@ -61,7 +61,7 @@ class LoginView(GenericAPIView):
 class UserView(APIView):
 	def get(self, request):
 		print(request.data)
-		token=request.headers.get('jwt')
+		token=request.COOKIES.get('jwt')
 		print(token)
 		print(request)
 		print(request.headers)
