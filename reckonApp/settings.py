@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '7!2zj-m**3yp23r=jxdvw0&4)&qcgv=q3busz4o&mn7zn*socw'
+SECRET_KEY = os.environ.get('RECKONAPP_SK')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -119,58 +119,15 @@ DATABASES = {
 
         'USER': 'mdkefcue',
 
-        'PASSWORD': 'iVZwRcsjfSicJBlMpGipUyTnsO2uhDGD',
-
+        'PASSWORD': os.environ.get('RECKONAPP_DB_PASS'),
         'HOST': 'queenie.db.elephantsql.com',
 
         'PORT': '5432',
         'TEST' : {
             'MIRROR': 'default'
         }
-
     }
-
-# DATABASES = {
-#     'default': {
-
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-
-#         'NAME': 'mdkefcue',
-
-#         'USER': 'mdkefcue',
-
-#         'PASSWORD': 'iVZwRcsjfSicJBlMpGipUyTnsO2uhDGD',
-
-#         'HOST': '127.0.0.1',
-
-#         'PORT': '5431',
-#         'TEST' : {
-#             'MIRROR': 'default'
-#         }
-
-#     }
-    
-    # 'TEST': {
-    #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-
-    #         'NAME': 'test_mdkefcue',
-
-    #         'USER': 'mdkefcue',
-
-    #         'PASSWORD': 'iVZwRcsjfSicJBlMpGipUyTnsO2uhDGD',
-
-    #         'HOST': '127.0.0.1',
-
-    #         'PORT': '5431',
-    #     }
 }
-# import sys
-# if 'test' in sys.argv:
-#     DATABASES['default'] = {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'test_mdkefcue'
-#         }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -207,7 +164,7 @@ USE_TZ = True
 
 #JWT_SECRET_KEY
 
-JWT_SECRET_KEY="neibiebveiv"
+JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
 
 
 # Static files (CSS, JavaScript, Images)
