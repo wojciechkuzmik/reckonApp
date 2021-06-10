@@ -24,6 +24,7 @@ class Groupmembers(models.Model):
     groupid = models.ForeignKey('Groups', models.DO_NOTHING, db_column='groupid')
     userid = models.ForeignKey('Users', models.DO_NOTHING, db_column='userid')
     adddate = models.DateTimeField()
+    isactive = models.BooleanField(default=True)
 
     class Meta:
         managed = False
