@@ -110,7 +110,6 @@ WSGI_APPLICATION = 'reckonApp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-
 DATABASES = {
     'default': {
 
@@ -122,14 +121,34 @@ DATABASES = {
 
         'PASSWORD': 'iVZwRcsjfSicJBlMpGipUyTnsO2uhDGD',
 
-        'HOST': '127.0.0.1',
+        'HOST': 'queenie.db.elephantsql.com',
 
-        'PORT': '5431',
+        'PORT': '5432',
         'TEST' : {
             'MIRROR': 'default'
         }
 
     }
+
+# DATABASES = {
+#     'default': {
+
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+#         'NAME': 'mdkefcue',
+
+#         'USER': 'mdkefcue',
+
+#         'PASSWORD': 'iVZwRcsjfSicJBlMpGipUyTnsO2uhDGD',
+
+#         'HOST': '127.0.0.1',
+
+#         'PORT': '5431',
+#         'TEST' : {
+#             'MIRROR': 'default'
+#         }
+
+#     }
     
     # 'TEST': {
     #         'ENGINE': 'django.db.backends.postgresql_psycopg2',

@@ -61,7 +61,7 @@ class GroupsAPITests(APITestCase):
         self.assertIn("rachunek testowy3", response.content.decode())
 
     def test_get_reckoning_info_should_response_200(self):
-        response = self.client.get('/api/reckonings/reckoning/26', HTTP_HOST = '127.0.0.1:8000')
+        response = self.client.get('/api/reckonings/reckoning/51', HTTP_HOST = '127.0.0.1:8000')
         self.assertEqual(response.status_code, 200)
     
     def test_get_reckoning_info_with_invalid_request_should_response_405(self):
@@ -69,7 +69,7 @@ class GroupsAPITests(APITestCase):
         self.assertEqual(response.status_code, 405)
     
     def test_get_reckoning_info_should_respond_with_json(self):
-        response = self.client.get('/api/reckonings/reckoning/26', HTTP_HOST = '127.0.0.1:8000')
+        response = self.client.get('/api/reckonings/reckoning/51', HTTP_HOST = '127.0.0.1:8000')
         self.assertEqual(response.status_code, 200)
         json_data = json.loads(response.content.decode())
         self.assertIsNotNone(json_data["reckoningid"])
@@ -117,7 +117,7 @@ class GroupsAPITests(APITestCase):
         self.assertEqual(response.status_code, 405)
 
     def test_get_reckonings_in_group_by_reckoning_id_should_response_json(self):
-        response = self.client.get('/api/reckonings/reckoningPosition/25', HTTP_HOST = '127.0.0.1:8000')
+        response = self.client.get('/api/reckonings/reckoningPosition/51', HTTP_HOST = '127.0.0.1:8000')
         self.assertEqual(response.status_code, 200)
         json_data = json.loads(response.content.decode())
         self.assertNotEqual(len(json_data), 0)
@@ -135,7 +135,7 @@ class GroupsAPITests(APITestCase):
             "name": "kwiate4",
             "amount": 15.0,
             "groupmemberid": 13,
-            "reckoningid": 25,
+            "reckoningid": 51,
             "paymentdate": "2021-05-23T23:03:00Z"
         }
         """
@@ -149,7 +149,7 @@ class GroupsAPITests(APITestCase):
             'name': "kwiate4",
             "amount": 15.0,
             "groupmemberid": 13,
-            "reckoningid": 25,
+            "reckoningid": 51,
             "paymentdate": "2021-05-23T23:03:00Z"
         }
         """
@@ -163,7 +163,7 @@ class GroupsAPITests(APITestCase):
             "name": "kwiate4",
             "amount": 15.0,
             "groupmemberid": 13,
-            "reckoningid": 25,
+            "reckoningid": 51,
             "paymentdate": "2021-05-23T23:03:00Z"
         }
         """
@@ -173,7 +173,7 @@ class GroupsAPITests(APITestCase):
         json_data = json.loads(response.content.decode())
         self.assertEqual(json_data["name"], "kwiate4")
         self.assertEqual(json_data["amount"], 15.0)
-        self.assertEqual(json_data["reckoningid"], 25)
+        self.assertEqual(json_data["reckoningid"], 51)
         self.assertEqual(json_data["paymentdate"], "2021-05-23T23:03:00Z")
         
         response = self.client.get(
@@ -196,7 +196,7 @@ class GroupsAPITests(APITestCase):
         self.assertEqual(response.status_code, 404)
     
     def test_get_reckon_info_for_user_should_response_with_json(self):
-        response = self.client.get('/api/reckonings/reckoningPositionsForUser/17', HTTP_HOST = '127.0.0.1:8000')
+        response = self.client.get('/api/reckonings/reckoningPositionsForUser/13', HTTP_HOST = '127.0.0.1:8000')
         self.assertEqual(response.status_code, 200)
         json_data = json.loads(response.content.decode())
         self.assertNotEqual(len(json_data), 0)
@@ -238,7 +238,7 @@ class GroupsAPITests(APITestCase):
     def test_update_reckoning_status_should_response_200(self):
         data = """
         {
-            "reckoningpositionid": 89
+            "reckoningpositionid": 134
         }
         """
         response = self.client.put('http://127.0.0.1:8000/api/reckonings/UpdateReckoningStatusView', data, 
@@ -249,12 +249,12 @@ class GroupsAPITests(APITestCase):
         self.assertEqual(response.status_code, 200)
         json_data = json.loads(response.content.decode())
         for el in json_data:
-            if el["reckoningpositionid"] == 89:
+            if el["reckoningpositionid"] == 134:
                 self.assertIsNone(el["paymentdate"])
         
         data = """
         {
-            "reckoningpositionid": 89
+            "reckoningpositionid": 134
         }
         """
         response = self.client.put('http://127.0.0.1:8000/api/reckonings/UpdateReckoningStatusView', data, 
