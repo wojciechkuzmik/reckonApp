@@ -204,17 +204,17 @@ class GroupsAPITests(APITestCase):
         
         self.assertGreaterEqual(tmp, 1)
 
-    # def test_delete_user_from_group_should_response_204(self):
-    #     response = self.client.delete('http://127.0.0.1:8000/api/groups/groupmembers/17')
-    #     self.assertEqual(response.status_code, 204)
+    def test_delete_user_from_group_should_response_204(self):
+        response = self.client.delete('http://127.0.0.1:8000/api/groups/groupmembers/53')
+        self.assertEqual(response.status_code, 204)
 
-    # def test_delete_user_from_group_should_response_404(self):
-    #     response = self.client.delete('http://127.0.0.1:8000/api/groups/groupmembers/5')
-    #     self.assertEqual(response.status_code, 404)
+    def test_delete_user_from_group_should_response_404(self):
+        response = self.client.delete('http://127.0.0.1:8000/api/groups/groupmembers/5')
+        self.assertEqual(response.status_code, 404)
     
-    # def test_delete_user_from_group_should_delete_user(self):
-    #     response = self.client.delete('http://127.0.0.1:8000/api/groups/groupmembers/17')
-    #     self.assertEqual(response.status_code, 204)
+    def test_delete_user_from_group_should_delete_user(self):
+        response = self.client.delete('http://127.0.0.1:8000/api/groups/groupmembers/53')
+        self.assertEqual(response.status_code, 204)
 
-    #     response = self.client.get('http://127.0.0.1:8000/api/groups/groupmembers/17')
-    #     self.assertEqual(response.status_code, 200)
+        response = self.client.get('http://127.0.0.1:8000/api/groups/groupmembers/53')
+        self.assertEqual(response.status_code, 200)

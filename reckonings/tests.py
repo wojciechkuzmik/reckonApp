@@ -8,7 +8,6 @@ class GroupsAPITests(APITestCase):
     def setUp(self) :
         self.client = APIClient()
     
-
     # /api/reckonings/reckoning endpoint tests
 
     def test_add_new_reckoning_should_respond_201(self):
