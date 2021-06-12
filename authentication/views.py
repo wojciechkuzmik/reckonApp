@@ -60,17 +60,12 @@ class LoginView(GenericAPIView):
 
 class UserView(APIView):
 	def get(self, request):
-		print(request.data)
-		token=request.COOKIES.get('jwt')
-		print(token)
-		print(request)
-		print(request.headers)
-		print(request.COOKIES)
+		token = request.headers.get('jwt')
 		if not token:
 			raise AuthenticationFailed('Unauthenticated')
-		
+
 		try:
-			payload=jwt.decode(token,settings.JWT_SECRET_KEY,algorithms='HS256')
+			payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
 		except jwt.ExpiredSignatureError:
 			raise AuthenticationFailed('Unauthenticated')
 		
@@ -125,12 +120,12 @@ class LogoutView(APIView):
 class SearchView(APIView):
 
 	def get(self, request):
-		token=request.headers.get('jwt')
+		token = request.headers.get('jwt')
 		if not token:
 			raise AuthenticationFailed('Unauthenticated')
-		
+
 		try:
-			payload=jwt.decode(token,settings.JWT_SECRET_KEY,algorithms='HS256')
+			payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
 		except jwt.ExpiredSignatureError:
 			raise AuthenticationFailed('Unauthenticated')
 		

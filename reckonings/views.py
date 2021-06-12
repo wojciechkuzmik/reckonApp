@@ -1,4 +1,7 @@
+import jwt
+from django.conf import settings
 from django.shortcuts import render
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from .serializers import ReckoningSerializer, ReckoningPositionSerializer,GroupMemberSerializer, ReckoningPositionForOneUserSerializer
 from groups.serializers import GroupSerializer,UserSerializer
@@ -52,7 +55,14 @@ class ReckoningView(GenericAPIView):
 class ReckoningsInGroupView(GenericAPIView):
     queryset=Reckonings
     def get(self, request, group_id):
-        
+        token = request.headers.get('jwt')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
         reckoning = Reckonings.objects.filter(groupid=group_id).order_by('-startdate')
 
         reckoning_ids={}
@@ -89,6 +99,14 @@ class CreateReckoningPositionView(GenericAPIView):
     serializer_class = ReckoningPositionSerializer
 
     def post(self, request):
+        token = request.headers.get('jwt')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
         serializer = ReckoningPositionSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -102,6 +120,14 @@ class CreateReckoningPositionForOneView(GenericAPIView):
     serializer_class = ReckoningPositionForOneUserSerializer
 
     def post(self, request):
+        token = request.headers.get('jwt')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
         rec_id=request.data['reckoningid']
         group_id=Reckonings.objects.filter(reckoningid=rec_id).values_list('groupid')[0]
         id_user_received=request.data['groupmemberid']
@@ -121,6 +147,14 @@ class CreateReckoningPositionForOneView(GenericAPIView):
 class ReckoningPositionsView(GenericAPIView):
     queryset=Reckoningpositions
     def get(self, request, reckoning_id):
+        token = request.headers.get('jwt')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
         reckoning = Reckoningpositions.objects.filter(reckoningid=reckoning_id)
         response_data=ReckoningPositionSerializer(reckoning,many=True).data
         for item in response_data:
@@ -135,6 +169,14 @@ class ReckoningPositionsView(GenericAPIView):
 class ReckoningPositionsForUserView(GenericAPIView):
     queryset=Groupmembers
     def get(self, request, user_id):
+        token = request.headers.get('jwt')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
         group_member_ids_for_user=Groupmembers.objects.filter(userid=user_id)
         group_member_ids_for_user=group_member_ids_for_user.values('groupmemberid')
         ids=[]
@@ -155,6 +197,14 @@ class ReckoningPositionsForUserView(GenericAPIView):
 class ReckoningPositionsByUserView(GenericAPIView):
     queryset=Reckoningpositions
     def get(self, request, user_id):
+        token = request.headers.get('jwt')
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        try:
+            payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms='HS256')
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated')
+
         group_member_ids_for_user=Groupmembers.objects.filter(userid=user_id)
         group_member_ids_for_user=group_member_ids_for_user.values('groupmemberid')
         ids=[]
