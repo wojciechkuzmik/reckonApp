@@ -68,6 +68,18 @@ class ReckoningPositionSerializer(serializers.ModelSerializer):
             instance = Reckoningpositions.objects.create(**full_data)
         return instance
 
+class ReckoningPositionUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reckoningpositions
+        fields = ['reckoningpositionid']
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+    def update(self,instance, validated_data):
+        instance.paymentdate=datetime.now()
+        instance.save()
+        return instance
+
 class ReckoningPositionForOneUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reckoningpositions

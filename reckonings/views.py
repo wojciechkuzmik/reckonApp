@@ -3,7 +3,7 @@ from django.conf import settings
 from django.shortcuts import render
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
-from .serializers import ReckoningSerializer, ReckoningPositionSerializer,GroupMemberSerializer, ReckoningPositionForOneUserSerializer
+from .serializers import ReckoningSerializer, ReckoningPositionSerializer,GroupMemberSerializer, ReckoningPositionForOneUserSerializer,ReckoningPositionUpdateSerializer
 from groups.serializers import GroupSerializer,UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -225,3 +225,14 @@ class ReckoningPositionsByUserView(GenericAPIView):
             userinfo=UserSerializer(Users.objects.get(userid=userid)).data
             item['author_detail']=userinfo
         return Response(response_data, status=status.HTTP_200_OK)
+
+class UpdateReckoningStatusView(GenericAPIView):
+    serializer_class = ReckoningPositionUpdateSerializer
+    def put(self,request):
+        r_id=request.data['reckoningpositionid']
+        rec_pos=Reckoningpositions.objects.get(reckoningpositionid=r_id)
+        serializer=ReckoningPositionUpdateSerializer(rec_pos,{"r_id":r_id},partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

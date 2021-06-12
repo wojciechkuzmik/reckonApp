@@ -120,14 +120,14 @@ DATABASES = {
         'USER': 'mdkefcue',
 
         'PASSWORD': os.environ.get('RECKONAPP_DB_PASS'),
-
         'HOST': 'queenie.db.elephantsql.com',
 
         'PORT': '5432',
-
+        'TEST' : {
+            'MIRROR': 'default'
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

@@ -112,9 +112,10 @@ class GroupMembersView(GenericAPIView):
             raise AuthenticationFailed('Unauthenticated')
         try:
             instance = Groupmembers.objects.get(groupmemberid=pk)
+            instance.isactive = False
+            instance.save()
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
